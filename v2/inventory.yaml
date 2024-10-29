@@ -649,6 +649,12 @@ paths:
                         id:
                           type: integer
                           example: 1
+                        name:
+                          type: string
+                          example: Cumulus NVUE
+                        tag:
+                          type: string
+                          example: cumulus_nvue
                   errors:
                     type: object
                     example: {}
@@ -738,19 +744,19 @@ components:
           type: object
           properties:
             id:
-              type: string
-              example: cumulus_linux
+              type: integer
+              example: 1
             name:
               type: string
-              example: Cumulus linux
+              example: Cumulus NVUE
             tag:
               type: string
-              example: cumulus_linux
+              example: cumulus_nvue
               enum:
                 - arista_eos
-                - cumulus_linux
                 - cumulus_nvue
-                - sonic
+                - dell_sonic
+                - ec_sonic
           description: ""
         mainAddress:
           type: string
@@ -856,18 +862,18 @@ components:
           properties:
             id:
               type: number
-              example: 12
+              example: 3
             name:
               type: string
-              example: SONiC
+              example: Dell-SONiC
             tag:
               type: string
-              example: sonic
+              example: dell_sonic
               enum:
                 - arista_eos
-                - cumulus_linux
                 - cumulus_nvue
-                - sonic
+                - dell_sonic
+                - ec_sonic
           description: Network operating system name.
         mainAddress:
           type: string
@@ -962,18 +968,18 @@ components:
           properties:
             id:
               type: number
-              example: 12
+              example: 3
             name:
               type: string
-              example: SONiC
+              example: Dell-SONiC
             tag:
               type: string
-              example: sonic
+              example: dell_sonic
               enum:
                 - arista_eos
-                - cumulus_linux
                 - cumulus_nvue
-                - sonic
+                - dell_sonic
+                - ec_sonic
           description: Network operating system of the unit.
         mainAddress:
           type: string
