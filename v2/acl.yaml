@@ -7,7 +7,7 @@ paths:
     get:
       tags:
         - ACL
-      summary: Request for getting ACLs.
+      summary: Request for a list of ACLs.
       parameters:
         - name: filterBySites
           in: query
@@ -69,7 +69,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: 2
+                        example: "v2"
                       statusCode:
                         example: 200
         400:
@@ -78,11 +78,92 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/acl.response.error"
+  /api/v2/acl/sync-status:
+    get:
+      tags:
+        - ACL
+      summary: Request for getting sync statuses.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        hardware:
+                          type: string
+                          example: "spine"
+                        status:
+                          type: string
+                          example: "ongoing"
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  meta:
+                    type: object
+                    properties:
+                      apiVersion:
+                        example: "v2"
+                      statusCode:
+                        example: 200
+        400:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/acl.response.error"
+  /api/v2/acl/check:
+    post:
+      tags:
+        - ACL
+      summary: Request for checking ACL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/acl.post.body"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+                  message:
+                    example: "Successfully checked."
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  meta:
+                    type: object
+                    properties:
+                      apiVersion:
+                        example: "v2"
+                      statusCode:
+                        example: 200
+        400:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/acl.response.error"
+
   /api/v2/acl/{id}:
     get:
       tags:
         - ACL
-      summary: Request to list ACL.
+      summary: Request for getting ACL by the provided ID.
       parameters:
         - name: id
           in: path
@@ -158,7 +239,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: 2
+                        example: "v2"
                       statusCode:
                         example: 200
         400:
@@ -214,7 +295,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: 2
+                        example: "v2"
                       statusCode:
                         example: 200
         400:
@@ -240,60 +321,10 @@ paths:
                           statusCode:
                             example: 404
   /api/v2/acl/{id}/{action}:
-    get:
-      tags:
-        - ACL
-      summary: Request for getting approve states or sync statuses.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of a ACL.
-        - name: action
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "approve-state"
-            enum: ["approve-state", "sync-status"]
-          description: ""
-      responses:
-        "200":
-          description: OK
-    post:
-      tags:
-        - ACL
-      summary: Request for checking ACL.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of a ACL.
-        - name: action
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "check"
-            enum: ["check"]
-          description: ""
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/acl.response.get.one.ok"
-      responses:
-        "200":
-          description: OK
     put:
       tags:
         - ACL
-      summary: Request for approve / reject / enable / disable.
+      summary: Request for action.
       parameters:
         - name: id
           in: path
@@ -310,8 +341,34 @@ paths:
             enum: ["approve", "reject", "enable", "disable"]
           description: ""
       responses:
-        "200":
+        200:
           description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+                  message:
+                    example: Successfully ACTION.
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  meta:
+                    type: object
+                    properties:
+                      apiVersion:
+                        example: "v2"
+                      statusCode:
+                        example: 200
+        400:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/acl.response.error"
 components:
   securitySchemes:
     cookieAuth:
@@ -333,24 +390,27 @@ components:
         - $ref: "#/components/schemas/acl.body.dst_prefix"
         - $ref: "#/components/schemas/acl.body.established"
         - $ref: "#/components/schemas/acl.body.icmp_type"
-        - $ref: "#/components/schemas/acl.body.proto"
+        - $ref: "#/components/schemas/acl.body.protocol"
         - $ref: "#/components/schemas/acl.body.reverse"
         - $ref: "#/components/schemas/acl.body.src_port_from"
         - $ref: "#/components/schemas/acl.body.src_port_group"
         - $ref: "#/components/schemas/acl.body.src_port_to"
         - $ref: "#/components/schemas/acl.body.src_prefix"
         - $ref: "#/components/schemas/acl.body.valid_until"
-        - $ref: "#/components/schemas/acl.body.dst_port_to"
+        - $ref: "#/components/schemas/acl.body.approvers"
     acl.post.body:
       required:
         - name
-        - action
+        - vpc
+        - protocol
         - src_prefix
         - dst_prefix
         - dst_port_from
         - dst_port_to
+        - dst_port_group
         - src_port_from
         - src_port_to
+        - src_port_group
       type: object
       allOf:
         - $ref: "#/components/schemas/acl.body.name"
@@ -363,24 +423,26 @@ components:
         - $ref: "#/components/schemas/acl.body.dst_prefix"
         - $ref: "#/components/schemas/acl.body.established"
         - $ref: "#/components/schemas/acl.body.icmp_type"
-        - $ref: "#/components/schemas/acl.body.proto"
+        - $ref: "#/components/schemas/acl.body.protocol"
         - $ref: "#/components/schemas/acl.body.reverse"
         - $ref: "#/components/schemas/acl.body.src_port_from"
         - $ref: "#/components/schemas/acl.body.src_port_group"
         - $ref: "#/components/schemas/acl.body.src_port_to"
         - $ref: "#/components/schemas/acl.body.src_prefix"
         - $ref: "#/components/schemas/acl.body.valid_until"
-        - $ref: "#/components/schemas/acl.body.dst_port_to"
     acl.put.body:
       required:
         - name
-        - action
+        - vpc
+        - protocol
         - src_prefix
         - dst_prefix
         - dst_port_from
         - dst_port_to
+        - dst_port_group
         - src_port_from
         - src_port_to
+        - src_port_group
       type: object
       allOf:
         - $ref: "#/components/schemas/acl.body.name"
@@ -393,14 +455,13 @@ components:
         - $ref: "#/components/schemas/acl.body.dst_prefix"
         - $ref: "#/components/schemas/acl.body.established"
         - $ref: "#/components/schemas/acl.body.icmp_type"
-        - $ref: "#/components/schemas/acl.body.proto"
+        - $ref: "#/components/schemas/acl.body.protocol"
         - $ref: "#/components/schemas/acl.body.reverse"
         - $ref: "#/components/schemas/acl.body.src_port_from"
         - $ref: "#/components/schemas/acl.body.src_port_group"
         - $ref: "#/components/schemas/acl.body.src_port_to"
         - $ref: "#/components/schemas/acl.body.src_prefix"
         - $ref: "#/components/schemas/acl.body.valid_until"
-        - $ref: "#/components/schemas/acl.body.dst_port_to"
     acl.body.id:
       type: object
       properties:
@@ -433,23 +494,23 @@ components:
       type: object
       properties:
         dst_port_from:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          example: 1
+          nullable: true
     acl.body.dst_port_group:
       type: object
       properties:
         dst_port_group:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          example: null
+          nullable: true
     acl.body.dst_port_to:
       type: object
       properties:
         dst_port_to:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          example: 1
+          nullable: true
     acl.body.dst_prefix:
       type: object
       properties:
@@ -460,8 +521,8 @@ components:
       type: object
       properties:
         established:
-          type: number
-          example: "yes"
+          type: boolean
+          example: true
     acl.body.icmp_type:
       type: object
       properties:
@@ -469,39 +530,39 @@ components:
           oneOf:
             - type: number
             - type: string
-    acl.body.proto:
+    acl.body.protocol:
       type: object
       properties:
-        proto:
+        protocol:
           type: string
           example: tcp
     acl.body.reverse:
       type: object
       properties:
         reverse:
-          type: string
-          example: "yes"
+          type: boolean
+          example: false
     acl.body.src_port_from:
       type: object
       properties:
         src_port_from:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          example: 1
+          nullable: true
     acl.body.src_port_group:
       type: object
       properties:
         src_port_group:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          example: null
+          nullable: true
     acl.body.src_port_to:
       type: object
       properties:
         src_port_to:
-          oneOf:
-            - type: number
-            - type: string
+          type: number
+          example: 1
+          nullable: true
     acl.body.src_prefix:
       type: object
       properties:
@@ -512,9 +573,24 @@ components:
       type: object
       properties:
         valid_until:
-          oneOf:
-            - type: number
-            - type: string
+          type: string
+          example: "2000-01-01T00:00:00Z"
+          nullable: true
+    acl.body.approvers:
+      type: object
+      properties:
+        approvers:
+          type: array
+          description: List of tenants
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: Tenant 
     acl.response.get.ok:
       type: object
       description: Success response
