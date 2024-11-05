@@ -3,7 +3,7 @@ info:
   title: Netris API
   version: v2
 paths:
-  /api/v2/acl:
+  /api/acl:
     get:
       tags:
         - ACL
@@ -69,7 +69,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: "v2"
+                        example: "v1"
                       statusCode:
                         example: 200
         400:
@@ -78,7 +78,165 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/acl.response.error"
-  /api/v2/acl/sync-status:
+    put:
+      tags:
+        - ACL
+      summary: Request for editing ACL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+                - type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                - $ref: "#/components/schemas/acl.put.body"
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        example: 23
+                  message:
+                    example: "Successfully updated."
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  meta:
+                    type: object
+                    properties:
+                      apiVersion:
+                        example: "v1"
+                      statusCode:
+                        example: 200
+        400:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/acl.response.error"
+        404:
+          description: Error
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/acl.response.error"
+                  - type: object
+                    properties:
+                      message:
+                        example: Not found.
+                      meta:
+                        type: object
+                        properties:
+                          statusCode:
+                            example: 404
+    delete:
+      tags:
+        - ACL
+      summary: Request for deleting ACL.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example: [1, 2, 3]
+              properties:
+                id:
+                  type: array
+                  items:
+                    type: integer
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    example: null
+                  message:
+                    example: Successfully deleted.
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  meta:
+                    type: object
+                    properties:
+                      apiVersion:
+                        example: "v1"
+                      statusCode:
+                        example: 200
+        400:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/acl.response.error"
+        404:
+          description: Error
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/acl.response.error"
+                  - type: object
+                    properties:
+                      message:
+                        example: Not found.
+                      meta:
+                        type: object
+                        properties:
+                          statusCode:
+                            example: 404
+  /api/acl/approvestate:
+    get:
+      tags:
+        - ACL
+      summary: Request for getting approve states.
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: string
+                      example: "TENANT_NAME"
+                  isSuccess:
+                    type: boolean
+                    example: true
+                  meta:
+                    type: object
+                    properties:
+                      apiVersion:
+                        example: "v1"
+                      statusCode:
+                        example: 200
+        400:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/acl.response.error"
+  /api/acl/syncstatus:
     get:
       tags:
         - ACL
@@ -96,10 +254,10 @@ paths:
                     items:
                       type: object
                       properties:
-                        hardware:
+                        location:
                           type: string
                           example: "spine"
-                        status:
+                        sync_acl:
                           type: string
                           example: "ongoing"
                   isSuccess:
@@ -109,7 +267,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: "v2"
+                        example: "v1"
                       statusCode:
                         example: 200
         400:
@@ -118,7 +276,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/acl.response.error"
-  /api/v2/acl/check:
+  /api/acl/check:
     post:
       tags:
         - ACL
@@ -149,7 +307,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: "v2"
+                        example: "v1"
                       statusCode:
                         example: 200
         400:
@@ -158,180 +316,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/acl.response.error"
-
-  /api/v2/acl/{id}:
-    get:
-      tags:
-        - ACL
-      summary: Request for getting ACL by the provided ID.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of a ACL.
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/acl.response.get.one.ok"
-        400:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/acl.response.error"
-        404:
-          description: Error
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/acl.response.error"
-                  - type: object
-                    properties:
-                      message:
-                        example: Not found.
-                      meta:
-                        type: object
-                        properties:
-                          statusCode:
-                            example: 404
-    put:
-      tags:
-        - ACL
-      summary: Request for editing ACL.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of a ACL.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/acl.put.body"
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        example: 23
-                  message:
-                    example: "Successfully updated."
-                  isSuccess:
-                    type: boolean
-                    example: true
-                  meta:
-                    type: object
-                    properties:
-                      apiVersion:
-                        example: "v2"
-                      statusCode:
-                        example: 200
-        400:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/acl.response.error"
-        404:
-          description: Error
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/acl.response.error"
-                  - type: object
-                    properties:
-                      message:
-                        example: Not found.
-                      meta:
-                        type: object
-                        properties:
-                          statusCode:
-                            example: 404
-    delete:
-      tags:
-        - ACL
-      summary: Request for deleting ACL.
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: The id of a specific ACL.
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  data:
-                    type: object
-                    example: null
-                  message:
-                    example: Successfully deleted.
-                  isSuccess:
-                    type: boolean
-                    example: true
-                  meta:
-                    type: object
-                    properties:
-                      apiVersion:
-                        example: "v2"
-                      statusCode:
-                        example: 200
-        400:
-          description: Error
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/acl.response.error"
-        404:
-          description: Error
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: "#/components/schemas/acl.response.error"
-                  - type: object
-                    properties:
-                      message:
-                        example: Not found.
-                      meta:
-                        type: object
-                        properties:
-                          statusCode:
-                            example: 404
-  /api/v2/acl/{id}/{action}:
+  /api/acl/{action}:
     put:
       tags:
         - ACL
       summary: Request for action.
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-          description: ID of a ACL.
         - name: action
           in: path
           required: true
@@ -340,6 +330,18 @@ paths:
             example: "approve"
             enum: ["approve", "reject", "enable", "disable"]
           description: ""
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              example: [1, 2, 3]
+              properties:
+                id:
+                  type: array
+                  items:
+                    type: integer
       responses:
         200:
           description: OK
@@ -360,7 +362,7 @@ paths:
                     type: object
                     properties:
                       apiVersion:
-                        example: "v2"
+                        example: "v1"
                       statusCode:
                         example: 200
         400:
@@ -390,19 +392,18 @@ components:
         - $ref: "#/components/schemas/acl.body.dst_prefix"
         - $ref: "#/components/schemas/acl.body.established"
         - $ref: "#/components/schemas/acl.body.icmp_type"
-        - $ref: "#/components/schemas/acl.body.protocol"
+        - $ref: "#/components/schemas/acl.body.proto"
         - $ref: "#/components/schemas/acl.body.reverse"
         - $ref: "#/components/schemas/acl.body.src_port_from"
         - $ref: "#/components/schemas/acl.body.src_port_group"
         - $ref: "#/components/schemas/acl.body.src_port_to"
         - $ref: "#/components/schemas/acl.body.src_prefix"
         - $ref: "#/components/schemas/acl.body.valid_until"
-        - $ref: "#/components/schemas/acl.body.approvers"
     acl.post.body:
       required:
         - name
         - vpc
-        - protocol
+        - proto
         - src_prefix
         - dst_prefix
         - dst_port_from
@@ -423,7 +424,7 @@ components:
         - $ref: "#/components/schemas/acl.body.dst_prefix"
         - $ref: "#/components/schemas/acl.body.established"
         - $ref: "#/components/schemas/acl.body.icmp_type"
-        - $ref: "#/components/schemas/acl.body.protocol"
+        - $ref: "#/components/schemas/acl.body.proto"
         - $ref: "#/components/schemas/acl.body.reverse"
         - $ref: "#/components/schemas/acl.body.src_port_from"
         - $ref: "#/components/schemas/acl.body.src_port_group"
@@ -434,7 +435,7 @@ components:
       required:
         - name
         - vpc
-        - protocol
+        - proto
         - src_prefix
         - dst_prefix
         - dst_port_from
@@ -455,7 +456,7 @@ components:
         - $ref: "#/components/schemas/acl.body.dst_prefix"
         - $ref: "#/components/schemas/acl.body.established"
         - $ref: "#/components/schemas/acl.body.icmp_type"
-        - $ref: "#/components/schemas/acl.body.protocol"
+        - $ref: "#/components/schemas/acl.body.proto"
         - $ref: "#/components/schemas/acl.body.reverse"
         - $ref: "#/components/schemas/acl.body.src_port_from"
         - $ref: "#/components/schemas/acl.body.src_port_group"
@@ -521,8 +522,8 @@ components:
       type: object
       properties:
         established:
-          type: boolean
-          example: true
+          type: number
+          example: 1
     acl.body.icmp_type:
       type: object
       properties:
@@ -530,18 +531,18 @@ components:
           oneOf:
             - type: number
             - type: string
-    acl.body.protocol:
+    acl.body.proto:
       type: object
       properties:
-        protocol:
+        proto:
           type: string
           example: tcp
     acl.body.reverse:
       type: object
       properties:
         reverse:
-          type: boolean
-          example: false
+          type: string
+          example: "no"
     acl.body.src_port_from:
       type: object
       properties:
@@ -576,21 +577,6 @@ components:
           type: string
           example: "2000-01-01T00:00:00Z"
           nullable: true
-    acl.body.approvers:
-      type: object
-      properties:
-        approvers:
-          type: array
-          description: List of tenants
-          items:
-            type: object
-            properties:
-              id:
-                type: integer
-                example: 1
-              name:
-                type: string
-                example: Tenant 
     acl.response.get.ok:
       type: object
       description: Success response
@@ -606,7 +592,7 @@ components:
           properties:
             apiVersion:
               type: string
-              example: "v2"
+              example: "v1"
             statusCode:
               type: integer
               example: 200
@@ -638,7 +624,7 @@ components:
           properties:
             apiVersion:
               type: string
-              example: "v2"
+              example: "v1"
             statusCode:
               type: integer
               example: 200
@@ -667,7 +653,7 @@ components:
           properties:
             apiVersion:
               type: string
-              example: "v2"
+              example: "v1"
             statusCode:
               type: integer
               example: 400
