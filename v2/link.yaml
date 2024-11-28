@@ -102,7 +102,7 @@ paths:
                 type: object
                 properties:
                   data:
-                     $ref: '#/components/schemas/linkBodyDelete'
+                     $ref: '#/components/schemas/linkBody'
                   errors:
                     example: null
                   message:
@@ -201,6 +201,12 @@ components:
       in: cookie
       name: Web Service Cookie
   schemas:
+    underlayObject:
+      type: string
+      enum:
+        - enabled
+        - disabled
+      example: 'enabled'
     mclagObject:
       nullable: true
       type: object
@@ -293,7 +299,10 @@ components:
               example: fe80::e29:efff:fece:fb21/64
         mclagPeerLink:
           allOf:
-              - $ref: '#/components/schemas/mclagObject'
+            - $ref: '#/components/schemas/mclagObject'
+        underlay:
+          allOf:
+            - $ref: '#/components/schemas/underlayObject'
     linkBody:
       type: object
       description: Physical connection
@@ -337,6 +346,9 @@ components:
         mclagPeerLink:
           allOf:
               - $ref: '#/components/schemas/mclagObject'
+        underlay:
+          allOf:
+            - $ref: '#/components/schemas/underlayObject'
     linkResErrorBody:
       type: object
       description: Error response
