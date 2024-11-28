@@ -829,6 +829,15 @@ components:
           - general
           - snat
           example: null
+        srvRole:
+          description: |
+            Use the 'generic' role if no Netris agent is running on the server. If the Netris integration agent is required on the server, select the appropriate platform type as the role.
+          nullable: true
+          type: string
+          enum:
+          - general
+          - hyperv_cs
+          example: null
         createdDate:
           type: number
           example: 1617280628000
@@ -1184,6 +1193,14 @@ components:
         customData:
           type: string
           description: Any custom data that can be assosiated with the object.
+        srvRole:
+          description: |
+            Use the 'generic' role if no Netris agent is running on the server. If the Netris integration agent is required on the server, select the appropriate platform type as the role.
+          nullable: true
+          type: string
+          enum:
+          - general
+          - hyperv_cs
         links:
           type: array
           items:
@@ -1217,6 +1234,14 @@ components:
         customData:
           type: string
           description: Any custom data that can be assosiated with the object.
+        srvRole:
+          description: |
+            Use the 'generic' role if no Netris agent is running on the server. If the Netris integration agent is required on the server, select the appropriate platform type as the role.
+          nullable: true
+          type: string
+          enum:
+          - general
+          - hyperv_cs
         links:
           type: array
           items:
